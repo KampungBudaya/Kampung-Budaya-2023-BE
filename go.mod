@@ -45,7 +45,7 @@ require (
 	github.com/swaggo/files v1.0.1 // indirect
 	github.com/swaggo/swag v1.16.2 // indirect
 	go.opencensus.io v0.24.0 // indirect
-	golang.org/x/crypto v0.12.0 // indirect
+	golang.org/x/crypto v0.12.0
 	golang.org/x/net v0.14.0 // indirect
 	golang.org/x/oauth2 v0.10.0 // indirect
 	golang.org/x/sync v0.3.0 // indirect
