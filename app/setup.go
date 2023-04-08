@@ -75,7 +75,7 @@ func Run() error {
 	})
 
 	fmt.Println("Server running on port " + port)
-	if err := http.ListenAndServe(":"+port, handlers.CORS(allowedHeaders, allowedOrigins, allowedMethods)(app)); err != nil {
+	if err := http.ListenAndServeTLS(":"+port, "server.crt", "server.key", handlers.CORS(allowedHeaders, allowedOrigins, allowedMethods)(app)); err != nil {
 		return err
 	}
 
