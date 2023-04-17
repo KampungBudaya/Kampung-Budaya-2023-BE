@@ -30,7 +30,7 @@ func NewContestHandler(router *mux.Router, Contest usecase.ContestUsecaseImpl) {
 	handlers := compHandler.router.PathPrefix("/participants").Subrouter()
 	handlers.Use(middleware.ValidateJWT)
 
-	handlers.HandleFunc("/", compHandler.GetAllParticipants).Methods(http.MethodGet)
+	handlers.HandleFunc("", compHandler.GetAllParticipants).Methods(http.MethodGet)
 	handlers.HandleFunc("/{id}", compHandler.GetParticipantByID).Methods(http.MethodGet)
 	handlers.HandleFunc("/{id}/accept", compHandler.AcceptParticipant).Methods(http.MethodPatch)
 	handlers.HandleFunc("/{id}/reject", compHandler.RejectParticipant).Methods(http.MethodPatch)
@@ -58,13 +58,6 @@ func (h *ContestHandler) RegisterContest(w http.ResponseWriter, r *http.Request)
 	resChan := make(chan interface{}, 1)
 
 	go func() {
-		user := r.Context().Value("user").(domain.UserContext)
-		if !strings.Contains(user.Roles, "Super Admin") {
-			code = http.StatusUnauthorized
-			errChan <- err
-			return
-		}
-
 		contestID, err := strconv.Atoi(r.FormValue("contestID"))
 		if err != nil {
 			code = http.StatusBadRequest
@@ -147,6 +140,13 @@ func (h *ContestHandler) GetAllParticipants(w http.ResponseWriter, r *http.Reque
 	resChan := make(chan interface{}, 1)
 
 	go func() {
+		user := r.Context().Value("user").(domain.UserContext)
+		if !strings.Contains(user.Roles, "Super Admin") {
+			code = http.StatusUnauthorized
+			errChan <- err
+			return
+		}
+
 		res, err := h.contest.GetAllParticipants(ctx)
 		if err != nil {
 			code = http.StatusInternalServerError
@@ -187,6 +187,13 @@ func (h *ContestHandler) GetParticipantByID(w http.ResponseWriter, r *http.Reque
 	resChan := make(chan interface{}, 1)
 
 	go func() {
+		user := r.Context().Value("user").(domain.UserContext)
+		if !strings.Contains(user.Roles, "Super Admin") {
+			code = http.StatusUnauthorized
+			errChan <- err
+			return
+		}
+
 		id, err := strconv.Atoi(mux.Vars(r)["id"])
 		if err != nil {
 			code = http.StatusBadRequest
