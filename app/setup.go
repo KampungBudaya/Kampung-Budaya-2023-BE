@@ -4,17 +4,22 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-
 	"os"
 
-	contest "github.com/KampungBudaya/Kampung-Budaya-2023-BE/api/contest/delivery/http"
-	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/api/contest/repository"
-	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/api/contest/usecase"
-	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/config"
-	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/util/response"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	httpSwagger "github.com/swaggo/http-swagger"
+
+	contestHttpDelivery "github.com/KampungBudaya/Kampung-Budaya-2023-BE/api/contest/delivery/http"
+	contestRepository "github.com/KampungBudaya/Kampung-Budaya-2023-BE/api/contest/repository"
+	contestUsecase "github.com/KampungBudaya/Kampung-Budaya-2023-BE/api/contest/usecase"
+
+	googleHttpDelivery "github.com/KampungBudaya/Kampung-Budaya-2023-BE/api/oauth/google/delivery/http"
+	googleUsecase "github.com/KampungBudaya/Kampung-Budaya-2023-BE/api/oauth/google/usecase"
+	oauthRepository "github.com/KampungBudaya/Kampung-Budaya-2023-BE/api/oauth/repository"
+
+	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/config"
+	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/util/response"
 )
 
 func Run() error {
@@ -51,9 +56,13 @@ func Run() error {
 		response.Success(w, http.StatusOK, "I'm fine and healthy! nice to see you :)")
 	}).Methods(http.MethodGet)
 
-	contestRepository := repository.NewContestRepository(db)
-	contestUsecase := usecase.NewContestUsecase(contestRepository)
-	contest.NewContestHandler(v1, contestUsecase)
+	contestRepository := contestRepository.NewContestRepository(db)
+	contestUsecase := contestUsecase.NewContestUsecase(contestRepository)
+	contestHttpDelivery.NewContestHandler(v1, contestUsecase)
+
+	oauthRepository := oauthRepository.NewOAuthRepository(db)
+	googleUsecase := googleUsecase.NewGoogleUsecase(oauthRepository, os.Getenv("GOOGLE_CLIENT_ID"))
+	googleHttpDelivery.NewGoogleHandler(v1, googleUsecase)
 
 	fmt.Println("Server running on port " + port)
 	if err := http.ListenAndServe(":"+port, app); err != nil {
