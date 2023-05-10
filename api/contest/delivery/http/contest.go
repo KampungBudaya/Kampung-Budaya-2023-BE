@@ -5,10 +5,12 @@ import (
 	"mime/multipart"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/api/contest/usecase"
 	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/domain"
+	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/middleware"
 	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/util/response"
 	"github.com/gorilla/mux"
 )
@@ -23,11 +25,15 @@ func NewContestHandler(router *mux.Router, Contest usecase.ContestUsecaseImpl) {
 		contest: Contest,
 		router:  router,
 	}
+
 	compHandler.router.HandleFunc("/contest", compHandler.RegisterContest).Methods(http.MethodPost)
-	compHandler.router.HandleFunc("/participants", compHandler.GetAllParticipants).Methods(http.MethodGet)
-	compHandler.router.HandleFunc("/participants/{id}", compHandler.GetParticipantByID).Methods(http.MethodGet)
-	compHandler.router.HandleFunc("/accept/participants/{id}", compHandler.AcceptParticipant).Methods(http.MethodPatch)
-	compHandler.router.HandleFunc("/reject/participants/{id}", compHandler.RejectParticipant).Methods(http.MethodPatch)
+	handlers := compHandler.router.PathPrefix("/participants").Subrouter()
+	handlers.Use(middleware.ValidateJWT)
+
+	handlers.HandleFunc("/", compHandler.GetAllParticipants).Methods(http.MethodGet)
+	handlers.HandleFunc("/{id}", compHandler.GetParticipantByID).Methods(http.MethodGet)
+	handlers.HandleFunc("/{id}/accept", compHandler.AcceptParticipant).Methods(http.MethodPatch)
+	handlers.HandleFunc("/{id}/reject", compHandler.RejectParticipant).Methods(http.MethodPatch)
 }
 
 func (h *ContestHandler) RegisterContest(w http.ResponseWriter, r *http.Request) {
@@ -52,6 +58,13 @@ func (h *ContestHandler) RegisterContest(w http.ResponseWriter, r *http.Request)
 	resChan := make(chan interface{}, 1)
 
 	go func() {
+		user := r.Context().Value("user").(domain.UserContext)
+		if !strings.Contains(user.Roles, "Super Admin") {
+			code = http.StatusUnauthorized
+			errChan <- err
+			return
+		}
+
 		contestID, err := strconv.Atoi(r.FormValue("contestID"))
 		if err != nil {
 			code = http.StatusBadRequest

@@ -4,7 +4,7 @@ const queryRegisterCompetition = `
 	INSERT INTO
 		participants
 	(
-		contests_id,
+		contest_id,
 		name,
 		birth,
 		category,
@@ -60,6 +60,6 @@ const queryGetParticipants = `
 	FROM
 		participants
 	JOIN
-		contests ON participants.contests_id = contests.id
+		contests ON participants.contest_id = contests.id
 	%s
 `
