@@ -27,6 +27,7 @@ func NewContestHandler(router *mux.Router, Contest usecase.ContestUsecaseImpl) {
 	}
 
 	compHandler.router.HandleFunc("/contest", compHandler.RegisterContest).Methods(http.MethodPost)
+
 	handlers := compHandler.router.PathPrefix("/participants").Subrouter()
 	handlers.Use(middleware.ValidateJWT)
 
@@ -237,6 +238,12 @@ func (h *ContestHandler) AcceptParticipant(w http.ResponseWriter, r *http.Reques
 		response.Success(w, code, data)
 	}()
 
+	user := r.Context().Value("user").(domain.UserContext)
+	if !strings.Contains(user.Roles, "Super Admin") {
+		code = http.StatusUnauthorized
+		return
+	}
+
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		code = http.StatusBadRequest
@@ -274,6 +281,12 @@ func (h *ContestHandler) RejectParticipant(w http.ResponseWriter, r *http.Reques
 		}
 		response.Success(w, code, data)
 	}()
+
+	user := r.Context().Value("user").(domain.UserContext)
+	if !strings.Contains(user.Roles, "Super Admin") {
+		code = http.StatusUnauthorized
+		return
+	}
 
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
