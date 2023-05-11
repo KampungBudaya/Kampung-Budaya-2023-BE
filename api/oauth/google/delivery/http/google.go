@@ -24,8 +24,8 @@ func NewGoogleHandler(router *mux.Router, google usecase.GoogleUsecaseImpl) {
 	}
 
 	googleOAuth := handler.router.PathPrefix("/oauth/google").Subrouter()
-	googleOAuth.HandleFunc("/", handler.SignIn)
 	googleOAuth.Use(middleware.Guest)
+	googleOAuth.HandleFunc("/", handler.SignIn).Methods(http.MethodPost)
 }
 
 func (h *GoogleHandler) SignIn(w http.ResponseWriter, r *http.Request) {

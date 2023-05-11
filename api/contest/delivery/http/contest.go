@@ -5,10 +5,12 @@ import (
 	"mime/multipart"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/api/contest/usecase"
 	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/domain"
+	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/middleware"
 	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/util/response"
 	"github.com/gorilla/mux"
 )
@@ -24,9 +26,12 @@ func NewContestHandler(router *mux.Router, Contest usecase.ContestUsecaseImpl) {
 		router:  router,
 	}
 	compHandler.router.HandleFunc("/contest", compHandler.RegisterContest).Methods(http.MethodPost)
-	compHandler.router.HandleFunc("/participants", compHandler.GetAllParticipants).Methods(http.MethodGet)
-	compHandler.router.HandleFunc("/participants/{id}", compHandler.GetParticipantByID).Methods(http.MethodGet)
-	compHandler.router.HandleFunc("/participants/{id}", compHandler.AcceptParticipant).Methods(http.MethodPatch)
+
+	participantsHandler := compHandler.router.PathPrefix("/participants").Subrouter()
+	participantsHandler.Use(middleware.ValidateJWT)
+	participantsHandler.HandleFunc("/participants", compHandler.GetAllParticipants).Methods(http.MethodGet)
+	participantsHandler.HandleFunc("/participants/{id}", compHandler.GetParticipantByID).Methods(http.MethodGet)
+	participantsHandler.HandleFunc("/participants/{id}", compHandler.AcceptParticipant).Methods(http.MethodPatch)
 }
 
 func (h *ContestHandler) RegisterContest(w http.ResponseWriter, r *http.Request) {
@@ -51,6 +56,13 @@ func (h *ContestHandler) RegisterContest(w http.ResponseWriter, r *http.Request)
 	resChan := make(chan interface{}, 1)
 
 	go func() {
+		user := r.Context().Value("user").(domain.UserContext)
+		if !strings.Contains(user.Roles, "Super Admin") {
+			code = http.StatusUnauthorized
+			errChan <- err
+			return
+		}
+
 		contestID, err := strconv.Atoi(r.FormValue("contestID"))
 		if err != nil {
 			code = http.StatusBadRequest

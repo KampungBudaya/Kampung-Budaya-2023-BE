@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"context"
 	"net/http"
 	"os"
 	"strconv"
@@ -59,6 +60,11 @@ func ValidateJWT(next http.Handler) http.Handler {
 		r.Header.Set("id", strconv.Itoa(claims.ID))
 		r.Header.Set("roles", claims.Roles)
 
-		next.ServeHTTP(w, r)
+		ctx := context.WithValue(r.Context(), "user", domain.UserContext{
+			ID:    claims.ID,
+			Roles: claims.Roles,
+		})
+
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

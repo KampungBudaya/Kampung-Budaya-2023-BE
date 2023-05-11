@@ -32,6 +32,11 @@ type CleanUser struct {
 	LastModified time.Time `json:"lastModified"`
 }
 
+type UserContext struct {
+	ID    int    `json:"id"`
+	Roles string `json:"roles"`
+}
+
 func (u *User) Clean() *CleanUser {
 	user := &CleanUser{
 		ID:           u.ID,
