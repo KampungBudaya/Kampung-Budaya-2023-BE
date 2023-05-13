@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/domain"
@@ -23,11 +24,11 @@ func NewOAuthRepository(mysql *sqlx.DB) OAuthRepositoryImpl {
 }
 
 func (r *OAuthRepository) GetByEmail(email string, ctx context.Context) (*domain.CleanUser, error) {
-	query := fmt.Sprintf(queryGetUserByEmail, "WHERE users.email = ? LIMIT 1")
+	query := fmt.Sprintf(queryGetUserByEmail, "WHERE users.email = ?")
 
-	var user *domain.User
-	if err := r.mysql.QueryRowxContext(ctx, query, email).StructScan(user); err != nil {
-		return nil, err
+	var user domain.User
+	if err := r.mysql.QueryRowxContext(ctx, query, email).StructScan(&user); err != nil {
+		return nil, errors.New("Record Not Found")
 	}
 
 	return user.Clean(), nil
