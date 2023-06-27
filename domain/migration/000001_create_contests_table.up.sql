@@ -9,4 +9,4 @@ VALUES ('Musik'),
   ('Tari'),
   ('Busana Kreasi Umum'),
   ('Busana Kreasi Forda'),
-  ('Stand Bazzar Forda')
+  ('Stand Bazzar Forda');
