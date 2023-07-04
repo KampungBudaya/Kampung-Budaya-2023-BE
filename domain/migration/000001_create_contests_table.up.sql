@@ -4,3 +4,9 @@ CREATE TABLE IF NOT EXISTS contests (
   created_at DATETIME NOT NULL DEFAULT (NOW()),
   updated_at DATETIME NOT NULL DEFAULT (NOW())
 );
+INSERT INTO contests (name)
+VALUES ('Musik'),
+  ('Tari'),
+  ('Busana Kreasi Umum'),
+  ('Busana Kreasi Forda'),
+  ('Stand Bazzar Forda')
