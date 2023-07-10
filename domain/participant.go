@@ -6,25 +6,38 @@ import (
 )
 
 type Participant struct {
-	ID           int       `json:"id"`
-	ContestID    int       `json:"contestID"`
-	Name         string    `json:"name"`
-	IsVerified   bool      `json:"isVerified"`
-	Origin       string    `json:"origin"`
-	FormURL      string    `json:"formURL"`
-	VideoURL     string    `json:"videoURL"`
-	PaymentProof string    `json:"paymentProof"`
-	CreatedAt    time.Time `json:"createdAt"`
-	UpdatedAt    time.Time `json:"updatedAt"`
+	ID           int
+	ContestID    int
+	Name         string
+	IsVerified   bool
+	Origin       string
+	PhoneNumber  string
+	FormURL      string
+	VideoURL     string
+	PaymentProof string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }
 
 type StoreParticipant struct {
 	ContestID    int    `json:"contestID" binding:"required"`
 	Name         string `json:"name" binding:"required"`
 	Origin       string `json:"origin" binding:"required"`
+	PhoneNumber  string `json:"phoneNumber" binding:"required"`
 	FormURL      string `json:"-"`
 	VideoURL     string `json:"videoURL" binding:"required"`
 	PaymentProof string `json:"-"`
+}
+
+type CleanParticipant struct {
+	ID           int    `json:"id"`
+	Origin       string `json:"origin"`
+	Contest      string `json:"contest"`
+	Name         string `json:"name"`
+	PhoneNumber  string `json:"phoneNumber"`
+	FormURL      string `json:"formURL"`
+	PaymentProof string `json:"paymentProof"`
+	VideoURL     string `json:"videoURL"`
 }
 
 func (p *StoreParticipant) Validate() error {
