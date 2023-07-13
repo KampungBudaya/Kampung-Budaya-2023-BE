@@ -3,4 +3,4 @@ CREATE TABLE IF NOT EXISTS contests (
   name VARCHAR(255) NOT NULL,
   created_at DATETIME NOT NULL DEFAULT (NOW()),
   updated_at DATETIME NOT NULL DEFAULT (NOW())
-)
+);

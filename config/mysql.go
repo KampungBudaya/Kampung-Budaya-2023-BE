@@ -10,7 +10,7 @@ import (
 
 func StartMySQLConn() (*sqlx.DB, error) {
 	dsn := fmt.Sprintf(
-		"%s:%s@(%s:%s)/%s",
+		"%s:%s@(%s:%s)/%s?parseTime=true",
 		os.Getenv("DB_USERNAME"),
 		os.Getenv("DB_PASSWORD"),
 		os.Getenv("DB_HOST"),
