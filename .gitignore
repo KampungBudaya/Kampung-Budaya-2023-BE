@@ -19,3 +19,13 @@
 
 # Go workspace file
 go.work
+
+# SSL/TLS Secret
+server.crt
+server.key
+
+# Etcetera
+.env
+.env.prod
+.env.dev
+serviceFirebaseKey.json
