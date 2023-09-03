@@ -1,20 +1,29 @@
 version: "3.9"
 
 networks:
-  app-net:
+  kambud23_net:
     driver: bridge
+volumes:
+  kambud23_db_data:
 
 services:
   db:
     image: rapidfort/mariadb:10.4
     container_name: kambud23_db
+    cpus: 0.7
+    mem_limit: 600m
+    restart: on-failure
     networks:
-      - app-net
+      - kambud23_net
+    volumes:
+      - kambud23_db_data:/var/lib/mysql
     env_file:
       - .env
     environment:
       - MARIADB_ROOT_PASSWORD=${DB_PASSWORD}
       - MARIADB_DATABASE=${DB_DATABASE}
+    ports:
+      - "3366:3306"
     healthcheck:
       test:
         [
@@ -34,8 +43,11 @@ services:
   backend:
     build: .
     container_name: kambud23_be
+    cpus: 0.3
+    mem_limit: 120m
+    restart: on-failure
     networks:
-      - app-net
+      - kambud23_net
     env_file:
       - .env
     environment:
