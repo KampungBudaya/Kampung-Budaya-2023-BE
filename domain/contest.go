@@ -6,14 +6,14 @@ import (
 )
 
 type Contest struct {
-	ID        int
-	Name      string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        int       `json:"id"`
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 type StoreContest struct {
-	Name string
+	Name string `json:"name" binding:"required"`
 }
 
 func (c *StoreContest) Validate() error {
