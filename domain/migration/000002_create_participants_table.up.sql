@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS participants(
   origin VARCHAR(255) NOT NULL,
   phone_number VARCHAR(13) NOT NULL,
   form_url VARCHAR(255) NOT NULL,
-  video_url VARCHAR(255) NOT NULL,
+  video_url VARCHAR(255),
   payment_proof VARCHAR(255) NOT NULL,
   created_at DATETIME NOT NULL DEFAULT (NOW()),
   updated_at DATETIME NOT NULL DEFAULT (NOW())
