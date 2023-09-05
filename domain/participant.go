@@ -2,18 +2,21 @@ package domain
 
 import (
 	"errors"
+	"time"
 )
 
-type ParticipantDB struct {
-	ID           int     `db:"id"`
-	Name         string  `db:"name"`
-	IsVerified   bool    `db:"is_verified"`
-	Contest      string  `db:"contest_name"`
-	Origin       string  `db:"origin"`
-	PhoneNumber  string  `db:"phone_number"`
-	FormURL      *string `db:"form_url"`
-	VideoURL     *string `db:"video_url"`
-	PaymentProof *string `db:"payment_proof"`
+type Participant struct {
+	ID           int
+	ContestID    int
+	Name         string
+	IsVerified   bool
+	Origin       string
+	PhoneNumber  string
+	FormURL      string
+	VideoURL     string
+	PaymentProof string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }
 
 type StoreParticipant struct {
@@ -28,48 +31,26 @@ type StoreParticipant struct {
 
 type CleanParticipant struct {
 	ID           int    `json:"id"`
-	Name         string `json:"name"`
-	IsVerified   bool   `json:"isVerified"`
-	Contest      string `json:"contest"`
 	Origin       string `json:"origin"`
+	Contest      string `json:"contest"`
+	Name         string `json:"name"`
 	PhoneNumber  string `json:"phoneNumber"`
 	FormURL      string `json:"formURL"`
-	VideoURL     string `json:"videoURL"`
 	PaymentProof string `json:"paymentProof"`
+	VideoURL     string `json:"videoURL"`
 }
 
 func (p *StoreParticipant) Validate() error {
 	switch {
 	case p.ContestID < 1:
-		return errors.New("ID LOMBA TIDAK VALID")
+		return errors.New("ID Lomba tidak valid")
 	case p.Name == "":
-		return errors.New("FIELD NAMA TIDAK BOLEH KOSONG")
+		return errors.New("Field nama tidak boleh kosong!")
 	case p.Origin == "":
-		return errors.New("FIELD ASAL TIDAK BOLEH KOSONG")
+		return errors.New("Field asal tidak boleh kosong!")
 	case p.VideoURL == "":
-		return errors.New("FIELD VIDEO URL TIDAK BOLEH KOSONG")
+		return errors.New("Field video url tidak boleh kosong!")
 	default:
 		return nil
 	}
-}
-
-func (p *ParticipantDB) Clean() *CleanParticipant {
-	cleanParticipant := &CleanParticipant{
-		ID:          p.ID,
-		Name:        p.Name,
-		IsVerified:  p.IsVerified,
-		Contest:     p.Contest,
-		Origin:      p.Origin,
-		PhoneNumber: p.PhoneNumber,
-	}
-	if p.VideoURL != nil {
-		cleanParticipant.VideoURL = *p.VideoURL
-	}
-	if p.FormURL != nil {
-		cleanParticipant.FormURL = *p.FormURL
-	}
-	if p.PaymentProof != nil {
-		cleanParticipant.PaymentProof = *p.PaymentProof
-	}
-	return cleanParticipant
 }

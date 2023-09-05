@@ -28,4 +28,4 @@ server.key
 .env
 .env.prod
 .env.dev
-firebase_credential.json
+serviceFirebaseKey.json
