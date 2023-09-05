@@ -7,6 +7,9 @@ import (
 
 	"os"
 
+	contest "github.com/KampungBudaya/Kampung-Budaya-2023-BE/api/contest/delivery/http"
+	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/api/contest/repository"
+	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/api/contest/usecase"
 	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/config"
 	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/util/response"
 	"github.com/gorilla/mux"
@@ -48,8 +51,12 @@ func Run() error {
 		response.Success(w, http.StatusOK, "I'm fine and healthy! nice to see you :)")
 	}).Methods(http.MethodGet)
 
+	contestRepository := repository.NewContestRepository(db)
+	contestUsecase := usecase.NewContestUsecase(contestRepository)
+	contest.NewContestHandler(v1, contestUsecase)
+
 	fmt.Println("Server running on port " + port)
-	if err := http.ListenAndServeTLS(":"+port, "server.crt", "server.key", app); err != nil {
+	if err := http.ListenAndServe(":"+port, app); err != nil {
 		return err
 	}
 
