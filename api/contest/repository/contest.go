@@ -30,6 +30,7 @@ func (r *ContestRepository) Create(ctx context.Context, req *domain.StorePartici
 	argKV := map[string]interface{}{
 		"contest_id":    req.ContestID,
 		"name":          req.Name,
+		"category":      req.Category,
 		"origin":        req.Origin,
 		"phone_number":  req.PhoneNumber,
 		"video_url":     req.VideoURL,

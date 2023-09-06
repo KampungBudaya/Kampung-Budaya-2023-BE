@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS participants(
   contests_id INT NOT NULL,
   name VARCHAR(255) NOT NULL,
   status ENUM('PENDING', 'ACCEPTED', 'REJECTED') DEFAULT 'PENDING',
+  category ENUM('FORDA', 'UMUM'),
   origin VARCHAR(255) NOT NULL,
   phone_number VARCHAR(13) NOT NULL,
   form_url VARCHAR(255) NOT NULL,

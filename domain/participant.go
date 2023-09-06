@@ -7,6 +7,7 @@ import (
 type ParticipantDB struct {
 	ID           int     `db:"id"`
 	Name         string  `db:"name"`
+	Category     string  `db:"category"`
 	Status       string  `db:"status"`
 	Contest      string  `db:"contest_name"`
 	Origin       string  `db:"origin"`
@@ -19,6 +20,7 @@ type ParticipantDB struct {
 type StoreParticipant struct {
 	ContestID    int    `json:"contestID" binding:"required"`
 	Name         string `json:"name" binding:"required"`
+	Category     string `json:"category" binding:"required"`
 	Origin       string `json:"origin" binding:"required"`
 	PhoneNumber  string `json:"phoneNumber" binding:"required"`
 	FormURL      string `json:"-"`
@@ -29,6 +31,7 @@ type StoreParticipant struct {
 type CleanParticipant struct {
 	ID           int    `json:"id"`
 	Name         string `json:"name"`
+	Category     string `json:"category"`
 	Status       string `json:"status"`
 	Contest      string `json:"contest"`
 	Origin       string `json:"origin"`
@@ -48,6 +51,8 @@ func (p *StoreParticipant) Validate() error {
 		return errors.New("FIELD ASAL TIDAK BOLEH KOSONG")
 	case p.PhoneNumber == "":
 		return errors.New("FIELD NOMOR TELEPON TIDAK BOLEH KOSONG")
+	case p.Category == "":
+		return errors.New("FIELD CATEGORY TIDAK BOLEH KOSONG")
 	default:
 		return nil
 	}
@@ -57,6 +62,7 @@ func (p *ParticipantDB) Clean() *CleanParticipant {
 	cleanParticipant := &CleanParticipant{
 		ID:          p.ID,
 		Name:        p.Name,
+		Category:    p.Category,
 		Status:      p.Status,
 		Contest:     p.Contest,
 		Origin:      p.Origin,

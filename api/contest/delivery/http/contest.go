@@ -59,6 +59,7 @@ func (h *ContestHandler) RegisterContest(w http.ResponseWriter, r *http.Request)
 			return
 		}
 		name := r.FormValue("name")
+		category := r.FormValue("category")
 		origin := r.FormValue("origin")
 		phoneNumber := r.FormValue("phoneNumber")
 		videoURL := r.FormValue("videoURL")
@@ -66,6 +67,7 @@ func (h *ContestHandler) RegisterContest(w http.ResponseWriter, r *http.Request)
 		req := domain.StoreParticipant{
 			ContestID:   contestID,
 			Name:        name,
+			Category:    category,
 			Origin:      origin,
 			PhoneNumber: phoneNumber,
 			VideoURL:    videoURL,

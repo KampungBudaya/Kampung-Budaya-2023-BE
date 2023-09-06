@@ -6,6 +6,7 @@ const queryRegisterCompetition = `
 	(
 		contests_id,
 		name,
+		category,
 		origin,
 		phone_number,
 		video_url,
@@ -14,6 +15,7 @@ const queryRegisterCompetition = `
 	) VALUES (
 		:contest_id,
 		:name,
+		:category,
 		:origin,
 		:phone_number,
 		:video_url,
@@ -35,6 +37,7 @@ const queryGetParticipants = `
 	SELECT
 		participants.id,
 		participants.name,
+		participants.category,
 		participants.status,
 		participants.origin,
 		participants.phone_number,
