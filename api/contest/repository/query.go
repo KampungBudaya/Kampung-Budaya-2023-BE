@@ -26,7 +26,7 @@ const queryUpdateParticipant = `
 	UPDATE
 		participants
 	SET
-		participants.is_verified = :is_verified
+		%s
 	WHERE
 		participants.id = :id
 `
@@ -35,7 +35,7 @@ const queryGetParticipants = `
 	SELECT
 		participants.id,
 		participants.name,
-		participants.is_verified,
+		participants.status,
 		participants.origin,
 		participants.phone_number,
 		participants.form_url,

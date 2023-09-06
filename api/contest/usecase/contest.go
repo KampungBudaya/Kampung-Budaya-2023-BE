@@ -17,6 +17,7 @@ type ContestUsecaseImpl interface {
 	GetAllParticipants(ctx context.Context) ([]*domain.CleanParticipant, error)
 	GetParticipantByID(ctx context.Context, id int) (*domain.CleanParticipant, error)
 	AcceptParticipant(ctx context.Context, id int) error
+	RejectParticipant(ctx context.Context, id int) error
 }
 
 type ContestUsecase struct {
@@ -88,11 +89,39 @@ func (uc *ContestUsecase) AcceptParticipant(ctx context.Context, id int) error {
 		return err
 	}
 
-	if participant.IsVerified {
-		return errors.New("PESERTA SUDAH TERVERIFIKASI")
+	if participant.Status == "ACCEPTED" {
+		return errors.New("PESERTA SUDAH DITERIMA")
 	}
 
-	err = uc.contest.UpdateStatus(ctx, id)
+	err = uc.contest.UpdateStatus(ctx, id, "ACCEPTED")
+	if err != nil {
+		return err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (uc *ContestUsecase) RejectParticipant(ctx context.Context, id int) error {
+	tx, err := uc.contest.BeginTx()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	participant, err := uc.contest.GetByID(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	if participant.Status == "REJECTED" {
+		return errors.New("PESERTA SUDAH DITOLAK")
+	}
+
+	err = uc.contest.UpdateStatus(ctx, id, "REJECTED")
 	if err != nil {
 		return err
 	}

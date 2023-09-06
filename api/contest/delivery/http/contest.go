@@ -26,7 +26,8 @@ func NewContestHandler(router *mux.Router, Contest usecase.ContestUsecaseImpl) {
 	compHandler.router.HandleFunc("/contest", compHandler.RegisterContest).Methods(http.MethodPost)
 	compHandler.router.HandleFunc("/participants", compHandler.GetAllParticipants).Methods(http.MethodGet)
 	compHandler.router.HandleFunc("/participants/{id}", compHandler.GetParticipantByID).Methods(http.MethodGet)
-	compHandler.router.HandleFunc("/participants/{id}", compHandler.AcceptParticipant).Methods(http.MethodPatch)
+	compHandler.router.HandleFunc("/accept/participants/{id}", compHandler.AcceptParticipant).Methods(http.MethodPatch)
+	compHandler.router.HandleFunc("/reject/participants/{id}", compHandler.RejectParticipant).Methods(http.MethodPatch)
 }
 
 func (h *ContestHandler) RegisterContest(w http.ResponseWriter, r *http.Request) {
@@ -96,7 +97,6 @@ func (h *ContestHandler) RegisterContest(w http.ResponseWriter, r *http.Request)
 	case <-ctx.Done():
 		err = ctx.Err()
 		code = http.StatusRequestTimeout
-		return
 	case err = <-errChan:
 	case data = <-resChan:
 	}
@@ -137,7 +137,6 @@ func (h *ContestHandler) GetAllParticipants(w http.ResponseWriter, r *http.Reque
 	case <-ctx.Done():
 		err = ctx.Err()
 		code = http.StatusRequestTimeout
-		return
 	case err = <-errChan:
 	case data = <-resChan:
 	}
@@ -185,7 +184,6 @@ func (h *ContestHandler) GetParticipantByID(w http.ResponseWriter, r *http.Reque
 	case <-ctx.Done():
 		err = ctx.Err()
 		code = http.StatusRequestTimeout
-		return
 	case err = <-errChan:
 	case data = <-resChan:
 	}
@@ -224,8 +222,45 @@ func (h *ContestHandler) AcceptParticipant(w http.ResponseWriter, r *http.Reques
 	case <-ctx.Done():
 		err = ctx.Err()
 		code = http.StatusRequestTimeout
-		return
 	default:
-		data = "SUCCES ACCEPT PARTICIPANT"
+		data = "BERHASIL MENERIMA PESERTA"
+	}
+}
+
+func (h *ContestHandler) RejectParticipant(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), 15*time.Second)
+	defer cancel()
+
+	var (
+		err  error
+		code = http.StatusOK
+		data interface{}
+	)
+
+	defer func() {
+		if err != nil {
+			response.Fail(w, code, err.Error())
+			return
+		}
+		response.Success(w, code, data)
+	}()
+
+	id, err := strconv.Atoi(mux.Vars(r)["id"])
+	if err != nil {
+		code = http.StatusBadRequest
+		return
+	}
+
+	err = h.contest.RejectParticipant(ctx, id)
+	if err != nil {
+		code = http.StatusInternalServerError
+	}
+
+	select {
+	case <-ctx.Done():
+		err = ctx.Err()
+		code = http.StatusRequestTimeout
+	default:
+		data = "BERHASIL MENOLAK PESERTA"
 	}
 }
