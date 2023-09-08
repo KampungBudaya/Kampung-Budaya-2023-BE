@@ -59,16 +59,24 @@ func (h *ContestHandler) RegisterContest(w http.ResponseWriter, r *http.Request)
 			return
 		}
 		name := r.FormValue("name")
+		birth := r.FormValue("birth")
 		category := r.FormValue("category")
-		origin := r.FormValue("origin")
+		institution := r.FormValue("institution")
+		email := r.FormValue("email")
+		instagram := r.FormValue("instagram")
+		line := r.FormValue("line")
 		phoneNumber := r.FormValue("phoneNumber")
 		videoURL := r.FormValue("videoURL")
 
 		req := domain.StoreParticipant{
 			ContestID:   contestID,
 			Name:        name,
+			Birth:       birth,
 			Category:    category,
-			Origin:      origin,
+			Institution: institution,
+			Email:       email,
+			Instagram:   instagram,
+			Line:        line,
 			PhoneNumber: phoneNumber,
 			VideoURL:    videoURL,
 		}

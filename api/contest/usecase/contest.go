@@ -39,7 +39,7 @@ func (uc *ContestUsecase) RegisterContest(ctx context.Context, req domain.StoreP
 	if err != nil {
 		return 0, err
 	}
-	linkForm, err := uploadPhotos(ctx, formByte, fmt.Sprintf("form-%s-%d", req.Name, req.ContestID))
+	linkForm, err := uploadPhotos(ctx, formByte, fmt.Sprintf("form-%s-%s-%d", req.Name, req.Institution, req.ContestID))
 	if err != nil {
 		return 0, err
 	}
@@ -48,7 +48,7 @@ func (uc *ContestUsecase) RegisterContest(ctx context.Context, req domain.StoreP
 	if err != nil {
 		return 0, err
 	}
-	linkPaymentProof, err := uploadPhotos(ctx, paymentProofByte, fmt.Sprintf("paymentProof-%s-%d", req.Name, req.ContestID))
+	linkPaymentProof, err := uploadPhotos(ctx, paymentProofByte, fmt.Sprintf("payment-proof-%s-%s-%d", req.Name, req.Institution, req.ContestID))
 	if err != nil {
 		return 0, err
 	}

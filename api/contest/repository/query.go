@@ -6,21 +6,29 @@ const queryRegisterCompetition = `
 	(
 		contests_id,
 		name,
+		birth,
 		category,
-		origin,
+		institution,
+		email,
+		instagram,
+		line,
 		phone_number,
 		video_url,
 		payment_proof,
-		form_url
+		form
 	) VALUES (
 		:contest_id,
 		:name,
+		:birth,
 		:category,
-		:origin,
+		:institution,
+		:email,
+		:instagram,
+		:line,
 		:phone_number,
 		:video_url,
 		:payment_proof,
-		:form_url
+		:form
 	)
 `
 
@@ -37,11 +45,15 @@ const queryGetParticipants = `
 	SELECT
 		participants.id,
 		participants.name,
+		participants.birth,
 		participants.category,
 		participants.status,
-		participants.origin,
+		participants.institution,
+		participants.email,
+		participants.instagram,
+		participants.line,
 		participants.phone_number,
-		participants.form_url,
+		participants.form,
 		participants.video_url,
 		participants.payment_proof,
 		contests.name AS contest_name
