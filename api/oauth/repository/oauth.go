@@ -56,6 +56,7 @@ func (r *OAuthRepository) UpdateProviderID(id int, providerID string, ctx contex
 
 	return nil
 }
+
 func (r *OAuthRepository) BeginTx() (*sqlx.Tx, error) {
 	return r.mysql.Beginx()
 }
