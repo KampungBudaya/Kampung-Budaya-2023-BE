@@ -1,9 +1,12 @@
 package domain
 
-import "time"
+import (
+	"time"
+)
 
 type User struct {
 	ID         int       `db:"id"`
+	Roles      *string   `db:"roles"`
 	Provider   string    `db:"provider"`
 	ProviderID *string   `db:"provider_id"`
 	Name       string    `db:"name"`
@@ -20,6 +23,7 @@ type StoreUser struct {
 
 type CleanUser struct {
 	ID           int       `json:"id"`
+	Roles        string    `json:"roles"`
 	Provider     string    `json:"provider"`
 	ProviderID   string    `json:"providerID"`
 	Name         string    `json:"name"`
@@ -29,7 +33,7 @@ type CleanUser struct {
 }
 
 func (u *User) Clean() *CleanUser {
-	cleanUser := &CleanUser{
+	user := &CleanUser{
 		ID:           u.ID,
 		Provider:     u.Provider,
 		Name:         u.Name,
@@ -38,9 +42,13 @@ func (u *User) Clean() *CleanUser {
 		LastModified: u.UpdatedAt,
 	}
 
-	if u.ProviderID != nil {
-		cleanUser.ProviderID = *u.ProviderID
+	if u.Roles != nil {
+		user.Roles = *u.Roles
 	}
 
-	return cleanUser
+	if u.ProviderID != nil {
+		user.ProviderID = *u.ProviderID
+	}
+
+	return user
 }

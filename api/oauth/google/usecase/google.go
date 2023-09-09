@@ -15,7 +15,8 @@ import (
 )
 
 type GoogleUsecaseImpl interface {
-	Authenticate(email string, providerID string, ctx context.Context) error
+	SearchUser(email string, ctx context.Context) (*domain.CleanUser, error)
+	UpdateProviderID(id int, providerID string, ctx context.Context) error
 	ValidateGoogleJWT(tokenString string) (domain.GoogleClaims, error)
 }
 
@@ -31,22 +32,24 @@ func NewGoogleUsecase(oauth repository.OAuthRepositoryImpl, clientID string) Goo
 	}
 }
 
-func (gu *GoogleUsecase) Authenticate(email string, providerID string, ctx context.Context) error {
+func (gu *GoogleUsecase) SearchUser(email string, ctx context.Context) (*domain.CleanUser, error) {
+	user, err := gu.oauth.GetByEmail(email, ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (gu *GoogleUsecase) UpdateProviderID(id int, providerID string, ctx context.Context) error {
 	tx, err := gu.oauth.BeginTx()
 	if err != nil {
 		return err
 	}
 	defer tx.Rollback()
 
-	user, err := gu.oauth.GetByEmail(email, ctx)
-	if err != nil {
+	if err = gu.oauth.UpdateProviderID(id, providerID, ctx); err != nil {
 		return err
-	}
-
-	if user.ProviderID == "" {
-		if err = gu.oauth.UpdateProviderID(user.ID, providerID, ctx); err != nil {
-			return err
-		}
 	}
 
 	if err = tx.Commit(); err != nil {

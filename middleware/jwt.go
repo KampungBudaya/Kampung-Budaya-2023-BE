@@ -12,10 +12,10 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-func GenerateJWT(id int, roles []string) (string, error) {
+func GenerateJWT(id int, roles string) (string, error) {
 	claims := domain.AuthClaims{
 		ID:    id,
-		Roles: strings.Join(roles, " "),
+		Roles: roles,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "Kampung Budaya 2023",
 			IssuedAt:  &jwt.NumericDate{Time: time.Now()},
@@ -32,8 +32,8 @@ func GenerateJWT(id int, roles []string) (string, error) {
 	return signedToken, nil
 }
 
-func ValidateJWT() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func ValidateJWT(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		bearer := r.Header.Get("Authorization")
 		if bearer == "" {
 			response.Fail(w, http.StatusUnauthorized, "Missing Authorization Header")
@@ -58,5 +58,7 @@ func ValidateJWT() http.HandlerFunc {
 
 		r.Header.Set("id", strconv.Itoa(claims.ID))
 		r.Header.Set("roles", claims.Roles)
-	}
+
+		next.ServeHTTP(w, r)
+	})
 }

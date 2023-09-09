@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/api/oauth/google/usecase"
+	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/middleware"
 	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/util/response"
 	"github.com/gorilla/mux"
 )
@@ -22,7 +23,9 @@ func NewGoogleHandler(router *mux.Router, google usecase.GoogleUsecaseImpl) {
 		router: router,
 	}
 
-	handler.router.HandleFunc("/oauth/google", handler.SignIn)
+	googleOAuth := handler.router.PathPrefix("/oauth/google").Subrouter()
+	googleOAuth.HandleFunc("/", handler.SignIn)
+	googleOAuth.Use(middleware.Guest)
 }
 
 func (h *GoogleHandler) SignIn(w http.ResponseWriter, r *http.Request) {
@@ -63,13 +66,31 @@ func (h *GoogleHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if err := h.google.Authenticate(claims.Email, claims.ID, ctx); err != nil {
+		user, err := h.google.SearchUser(claims.Email, ctx)
+		if err != nil {
 			code = http.StatusUnauthorized
 			errChan <- err
 			return
 		}
 
-		resChan <- "OK?"
+		if user.ProviderID == "" {
+			if h.google.UpdateProviderID(user.ID, claims.ID, ctx); err != nil {
+				code = http.StatusInternalServerError
+				errChan <- err
+				return
+			}
+		}
+
+		token, err := middleware.GenerateJWT(user.ID, user.Roles)
+		if err != nil {
+			code = http.StatusInternalServerError
+			errChan <- err
+			return
+		}
+
+		resChan <- map[string]string{
+			"token": token,
+		}
 	}()
 
 	select {
