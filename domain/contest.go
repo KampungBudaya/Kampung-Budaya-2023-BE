@@ -23,7 +23,7 @@ type CleanContest struct {
 
 func (c *StoreContest) Validate() error {
 	if c.Name == "" {
-		return errors.New("Field nama tidak boleh kosong!")
+		return errors.New("FIELD NAMA TIDAK BOLEH KOSONG")
 	}
 
 	return nil
