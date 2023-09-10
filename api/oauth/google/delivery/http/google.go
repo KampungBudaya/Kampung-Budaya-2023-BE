@@ -24,8 +24,8 @@ func NewGoogleHandler(router *mux.Router, google usecase.GoogleUsecaseImpl) {
 	}
 
 	googleOAuth := handler.router.PathPrefix("/oauth/google").Subrouter()
-	googleOAuth.Use(middleware.Guest)
-	googleOAuth.HandleFunc("/", handler.SignIn).Methods(http.MethodPost)
+	// googleOAuth.Use(middleware.Guest)
+	googleOAuth.HandleFunc("", handler.SignIn).Methods(http.MethodPost)
 }
 
 func (h *GoogleHandler) SignIn(w http.ResponseWriter, r *http.Request) {
@@ -46,59 +46,44 @@ func (h *GoogleHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 		response.Success(w, code, data)
 	}()
 
-	errChan := make(chan error, 1)
-	resChan := make(chan interface{}, 1)
+	var request struct{ token string }
 
-	go func() {
-		var request struct{ token *string }
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&request); err != nil {
+		code = http.StatusBadRequest
+		return
+	}
 
-		decoder := json.NewDecoder(r.Body)
-		if err := decoder.Decode(&request); err != nil {
-			code = http.StatusBadRequest
-			errChan <- err
-			return
-		}
+	claims, err := h.google.ValidateGoogleJWT(request.token)
+	if err != nil {
+		code = http.StatusBadRequest
+		return
+	}
 
-		claims, err := h.google.ValidateGoogleJWT(*request.token)
-		if err != nil {
-			code = http.StatusBadRequest
-			errChan <- err
-			return
-		}
+	user, err := h.google.SearchUser(claims.Email, ctx)
+	if err != nil {
+		code = http.StatusUnauthorized
+		return
+	}
 
-		user, err := h.google.SearchUser(claims.Email, ctx)
-		if err != nil {
-			code = http.StatusUnauthorized
-			errChan <- err
-			return
-		}
-
-		if user.ProviderID == "" {
-			if h.google.UpdateProviderID(user.ID, claims.ID, ctx); err != nil {
-				code = http.StatusInternalServerError
-				errChan <- err
-				return
-			}
-		}
-
-		token, err := middleware.GenerateJWT(user.ID, user.Roles)
-		if err != nil {
+	if user.ProviderID == "" {
+		if h.google.UpdateProviderID(user.ID, claims.ID, ctx); err != nil {
 			code = http.StatusInternalServerError
-			errChan <- err
 			return
 		}
+	}
 
-		resChan <- map[string]string{
-			"token": token,
-		}
-	}()
+	token, err := middleware.GenerateJWT(user.ID, user.Roles)
+	if err != nil {
+		code = http.StatusInternalServerError
+		return
+	}
 
 	select {
 	case <-ctx.Done():
 		err = ctx.Err()
 		code = http.StatusRequestTimeout
-		return
-	case err = <-errChan:
-	case data = <-resChan:
+	default:
+		data = struct{ token string }{token: token}
 	}
 }
