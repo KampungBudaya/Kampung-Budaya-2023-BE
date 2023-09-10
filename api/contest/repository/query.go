@@ -4,21 +4,31 @@ const queryRegisterCompetition = `
 	INSERT INTO
 		participants
 	(
-		contests_id,
+		contest_id,
 		name,
-		origin,
+		birth,
+		category,
+		institution,
+		email,
+		instagram,
+		line,
 		phone_number,
 		video_url,
 		payment_proof,
-		form_url
+		form
 	) VALUES (
 		:contest_id,
 		:name,
-		:origin,
+		:birth,
+		:category,
+		:institution,
+		:email,
+		:instagram,
+		:line,
 		:phone_number,
 		:video_url,
 		:payment_proof,
-		:form_url
+		:form
 	)
 `
 
@@ -26,7 +36,7 @@ const queryUpdateParticipant = `
 	UPDATE
 		participants
 	SET
-		participants.is_verified = :is_verified
+		%s
 	WHERE
 		participants.id = :id
 `
@@ -35,16 +45,21 @@ const queryGetParticipants = `
 	SELECT
 		participants.id,
 		participants.name,
-		participants.is_verified,
-		participants.origin,
+		participants.birth,
+		participants.category,
+		participants.status,
+		participants.institution,
+		participants.email,
+		participants.instagram,
+		participants.line,
 		participants.phone_number,
-		participants.form_url,
+		participants.form,
 		participants.video_url,
 		participants.payment_proof,
 		contests.name AS contest_name
 	FROM
 		participants
 	JOIN
-		contests ON participants.contests_id = contests.id
+		contests ON participants.contest_id = contests.id
 	%s
 `

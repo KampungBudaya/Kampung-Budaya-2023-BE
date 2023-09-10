@@ -5,10 +5,12 @@ import (
 	"mime/multipart"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/api/contest/usecase"
 	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/domain"
+	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/middleware"
 	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/util/response"
 	"github.com/gorilla/mux"
 )
@@ -23,10 +25,16 @@ func NewContestHandler(router *mux.Router, Contest usecase.ContestUsecaseImpl) {
 		contest: Contest,
 		router:  router,
 	}
+
 	compHandler.router.HandleFunc("/contest", compHandler.RegisterContest).Methods(http.MethodPost)
-	compHandler.router.HandleFunc("/participants", compHandler.GetAllParticipants).Methods(http.MethodGet)
-	compHandler.router.HandleFunc("/participants/{id}", compHandler.GetParticipantByID).Methods(http.MethodGet)
-	compHandler.router.HandleFunc("/participants/{id}", compHandler.AcceptParticipant).Methods(http.MethodPatch)
+
+	handlers := compHandler.router.PathPrefix("/participants").Subrouter()
+	handlers.Use(middleware.ValidateJWT)
+
+	handlers.HandleFunc("", compHandler.GetAllParticipants).Methods(http.MethodGet)
+	handlers.HandleFunc("/{id}", compHandler.GetParticipantByID).Methods(http.MethodGet)
+	handlers.HandleFunc("/{id}/accept", compHandler.AcceptParticipant).Methods(http.MethodPatch)
+	handlers.HandleFunc("/{id}/reject", compHandler.RejectParticipant).Methods(http.MethodPatch)
 }
 
 func (h *ContestHandler) RegisterContest(w http.ResponseWriter, r *http.Request) {
@@ -58,14 +66,24 @@ func (h *ContestHandler) RegisterContest(w http.ResponseWriter, r *http.Request)
 			return
 		}
 		name := r.FormValue("name")
-		origin := r.FormValue("origin")
+		birth := r.FormValue("birth")
+		category := r.FormValue("category")
+		institution := r.FormValue("institution")
+		email := r.FormValue("email")
+		instagram := r.FormValue("instagram")
+		line := r.FormValue("line")
 		phoneNumber := r.FormValue("phoneNumber")
 		videoURL := r.FormValue("videoURL")
 
 		req := domain.StoreParticipant{
 			ContestID:   contestID,
 			Name:        name,
-			Origin:      origin,
+			Birth:       birth,
+			Category:    category,
+			Institution: institution,
+			Email:       email,
+			Instagram:   instagram,
+			Line:        line,
 			PhoneNumber: phoneNumber,
 			VideoURL:    videoURL,
 		}
@@ -96,7 +114,6 @@ func (h *ContestHandler) RegisterContest(w http.ResponseWriter, r *http.Request)
 	case <-ctx.Done():
 		err = ctx.Err()
 		code = http.StatusRequestTimeout
-		return
 	case err = <-errChan:
 	case data = <-resChan:
 	}
@@ -124,6 +141,13 @@ func (h *ContestHandler) GetAllParticipants(w http.ResponseWriter, r *http.Reque
 	resChan := make(chan interface{}, 1)
 
 	go func() {
+		user := r.Context().Value("user").(domain.UserContext)
+		if !strings.Contains(user.Roles, "Super Admin") {
+			code = http.StatusUnauthorized
+			errChan <- err
+			return
+		}
+
 		res, err := h.contest.GetAllParticipants(ctx)
 		if err != nil {
 			code = http.StatusInternalServerError
@@ -137,7 +161,6 @@ func (h *ContestHandler) GetAllParticipants(w http.ResponseWriter, r *http.Reque
 	case <-ctx.Done():
 		err = ctx.Err()
 		code = http.StatusRequestTimeout
-		return
 	case err = <-errChan:
 	case data = <-resChan:
 	}
@@ -165,6 +188,13 @@ func (h *ContestHandler) GetParticipantByID(w http.ResponseWriter, r *http.Reque
 	resChan := make(chan interface{}, 1)
 
 	go func() {
+		user := r.Context().Value("user").(domain.UserContext)
+		if !strings.Contains(user.Roles, "Super Admin") {
+			code = http.StatusUnauthorized
+			errChan <- err
+			return
+		}
+
 		id, err := strconv.Atoi(mux.Vars(r)["id"])
 		if err != nil {
 			code = http.StatusBadRequest
@@ -185,7 +215,6 @@ func (h *ContestHandler) GetParticipantByID(w http.ResponseWriter, r *http.Reque
 	case <-ctx.Done():
 		err = ctx.Err()
 		code = http.StatusRequestTimeout
-		return
 	case err = <-errChan:
 	case data = <-resChan:
 	}
@@ -209,6 +238,12 @@ func (h *ContestHandler) AcceptParticipant(w http.ResponseWriter, r *http.Reques
 		response.Success(w, code, data)
 	}()
 
+	user := r.Context().Value("user").(domain.UserContext)
+	if !strings.Contains(user.Roles, "Super Admin") {
+		code = http.StatusUnauthorized
+		return
+	}
+
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		code = http.StatusBadRequest
@@ -224,8 +259,51 @@ func (h *ContestHandler) AcceptParticipant(w http.ResponseWriter, r *http.Reques
 	case <-ctx.Done():
 		err = ctx.Err()
 		code = http.StatusRequestTimeout
-		return
 	default:
-		data = "SUCCES ACCEPT PARTICIPANT"
+		data = "BERHASIL MENERIMA PESERTA"
+	}
+}
+
+func (h *ContestHandler) RejectParticipant(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), 15*time.Second)
+	defer cancel()
+
+	var (
+		err  error
+		code = http.StatusOK
+		data interface{}
+	)
+
+	defer func() {
+		if err != nil {
+			response.Fail(w, code, err.Error())
+			return
+		}
+		response.Success(w, code, data)
+	}()
+
+	user := r.Context().Value("user").(domain.UserContext)
+	if !strings.Contains(user.Roles, "Super Admin") {
+		code = http.StatusUnauthorized
+		return
+	}
+
+	id, err := strconv.Atoi(mux.Vars(r)["id"])
+	if err != nil {
+		code = http.StatusBadRequest
+		return
+	}
+
+	err = h.contest.RejectParticipant(ctx, id)
+	if err != nil {
+		code = http.StatusInternalServerError
+	}
+
+	select {
+	case <-ctx.Done():
+		err = ctx.Err()
+		code = http.StatusRequestTimeout
+	default:
+		data = "BERHASIL MENOLAK PESERTA"
 	}
 }
