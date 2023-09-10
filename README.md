@@ -13,6 +13,7 @@ Follow these instructions to set up and run the backend service locally.
 - Golang must be installed on your machine. If not, you can download it from the [official Golang website](https://golang.org/dl/).
 - Ensure you have a MySQL/MariaDB database available.
 - Make package to run make automated commands
+- [Migrate](https://github.com/golang-migrate/migrate) CLI to run migration file
 
 ### Installation
 
@@ -29,22 +30,27 @@ Follow these instructions to set up and run the backend service locally.
    cp .env.example .env
    ```
 
-3. Install project dependencies:
+3. Place your Firebase JSON credential in the root directory, alongside the .env file
+    ```bash
+    cp ~/firebase_credential.json .
+    ```
+
+4. Install project dependencies:
 
    ```bash
    go mod download
    ```
 
-4. Run the database migrations using the provided Makefile:
+5. Run the database migrations using the provided Makefile:
 
    ```bash
    make migrate-up
    ```
 
-5. Build and run the service:
+6. Build and run the service:
 
    ```bash
-   go run main.go
+   make up
    ```
 
 The service should now be running locally at `http://localhost:8080` or any port you desire to use.
@@ -59,6 +65,7 @@ The database migration scripts are managed using the go-migrate module. You can 
 
 ### Available Makefile Commands
 
+- `make up`: Run the server
 - `make migrate-up`: Apply database migrations.
 - `make migrate-down`: Drop all migration tables.
 - `make migrate-drop`: Drop entire schema's table.
