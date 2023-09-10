@@ -7,8 +7,7 @@ CREATE TABLE IF NOT EXISTS contests (
   updated_at DATETIME NOT NULL DEFAULT (NOW())
 );
 INSERT INTO contests (name) VALUES
-('Musik'),
-('Tari'),
-('Busana Kreasi Umum'),
-('Busana Kreasi Forda'),
-('Stand Bazzar Forda');
+  ('Musik'),
+  ('Tari'),
+  ('Busana Kreasi'),
+  ('Stand Bazzar');

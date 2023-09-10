@@ -9,12 +9,9 @@ type AuthClaims struct {
 }
 
 type GoogleClaims struct {
-	ID            string `json:"id"`
 	Email         string `json:"email"`
-	VerifiedEmail bool   `json:"verified_email"`
-	Name          string `json:"name"`
-	GivenName     string `json:"given_name"`
-	Picture       string `json:"picture"`
-	Locale        string `json:"locale"`
+	EmailVerified bool   `json:"email_verified"`
+	FirstName     string `json:"given_name"`
+	LastName      string `json:"family_name"`
 	jwt.StandardClaims
 }
