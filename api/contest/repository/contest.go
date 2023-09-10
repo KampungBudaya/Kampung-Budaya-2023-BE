@@ -12,7 +12,7 @@ type ContestRepositoryImpl interface {
 	Create(ctx context.Context, req *domain.StoreParticipant, linkPhotos []string) (int, error)
 	GetAll(ctx context.Context) ([]*domain.CleanParticipant, error)
 	GetByID(ctx context.Context, id int) (*domain.CleanParticipant, error)
-	UpdateStatus(ctx context.Context, id int) error
+	UpdateStatus(ctx context.Context, id int, status string) error
 	BeginTx() (*sqlx.Tx, error)
 }
 
@@ -30,10 +30,15 @@ func (r *ContestRepository) Create(ctx context.Context, req *domain.StorePartici
 	argKV := map[string]interface{}{
 		"contest_id":    req.ContestID,
 		"name":          req.Name,
-		"origin":        req.Origin,
+		"birth":         req.Birth,
+		"category":      req.Category,
+		"institution":   req.Institution,
+		"email":         req.Email,
+		"instagram":     req.Instagram,
+		"line":          req.Line,
 		"phone_number":  req.PhoneNumber,
 		"video_url":     req.VideoURL,
-		"form_url":      linkPhotos[0],
+		"form":          linkPhotos[0],
 		"payment_proof": linkPhotos[1],
 	}
 
@@ -101,13 +106,15 @@ func (r *ContestRepository) GetAll(ctx context.Context) ([]*domain.CleanParticip
 	return participants, nil
 }
 
-func (r *ContestRepository) UpdateStatus(ctx context.Context, id int) error {
+func (r *ContestRepository) UpdateStatus(ctx context.Context, id int, status string) error {
 	argKV := map[string]interface{}{
-		"is_verified": true,
-		"id":          id,
+		"status": status,
+		"id":     id,
 	}
 
-	query, args, err := sqlx.Named(queryUpdateParticipant, argKV)
+	queryUpdateStatus := fmt.Sprintf(queryUpdateParticipant, "status = :status")
+
+	query, args, err := sqlx.Named(queryUpdateStatus, argKV)
 	if err != nil {
 		return err
 	}
