@@ -106,14 +106,13 @@ func (uc *ContestUsecase) AcceptParticipant(ctx context.Context, id int) error {
 	}
 
 	mail := email.NewMailClient()
-	mail.SetSubject("Announcement Email")
-	mail.SetReciever(participant.Email)
 	mail.SetSender(os.Getenv("CONFIG_SENDER_NAME"))
-	err = mail.SetBodyHTML(participant.Name, participant.Contest)
-	if err != nil {
+	mail.SetReciever(participant.Email)
+	mail.SetSubject("Announcement Email")
+	mail.SetBodyHTML(participant.Name, participant.Contest)
+	if err := mail.SendMail(); err != nil {
 		return err
 	}
-
 	return nil
 }
 

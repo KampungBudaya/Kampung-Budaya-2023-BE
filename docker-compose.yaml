@@ -31,7 +31,7 @@ services:
           "mysqladmin",
           "ping",
           "-h",
-          "localhost",
+          "${DB_HOST}",
           "-u",
           "${DB_USERNAME}",
           "-p${DB_PASSWORD}"

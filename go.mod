@@ -5,6 +5,7 @@ go 1.21.0
 require (
 	firebase.google.com/go v3.13.0+incompatible
 	github.com/go-sql-driver/mysql v1.7.1
+	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/gorilla/mux v1.8.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/joho/godotenv v1.5.1

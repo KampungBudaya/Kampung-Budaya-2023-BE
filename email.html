@@ -14,6 +14,9 @@
       }
 
       .container {
+        justify-content: center;
+        text-align: center;
+        align-content: center;
         border-radius: 10px;
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
         max-width: 600px;
@@ -22,7 +25,7 @@
       }
 
       .header {
-        background-color: blue;
+        background-color: rgb(15, 71, 175);
         color: #fff;
         padding: 10px;
         border-radius: 10px 10px 0 0;
@@ -36,16 +39,19 @@
       h1 {
         font-size: 28px;
         margin-top: 0;
+        color: black; /* Warna teks hitam */
       }
 
       p {
         font-size: 18px;
         line-height: 1.6;
+        color: black; /* Warna teks hitam */
       }
 
       .details {
         text-align: center;
         margin-top: 20px;
+        color: black;
       }
 
       .details ul {
@@ -59,8 +65,8 @@
 
       .button {
         display: inline-block;
-        background-color: blue;
-        color: #fff;
+        background-color: rgb(158, 158, 158);
+        color: #ffffff;
         padding: 10px 20px;
         text-decoration: none;
         border-radius: 5px;
@@ -78,21 +84,24 @@
       <div class="header">
         <img
           class="logo"
-          src="https://example.com/logo.png"
+          src="https://drive.google.com/uc?id=14w28DEToJCqe8paN9c_AoXBkFpMLe0Si"
           alt="Logo Kampung Budaya"
         />
-        <h1>Selamat!</h1>
+        <h3>Kampung Budaya 2023</h3>
       </div>
-      <p>Terimakasih telah mendaftar untuk Lomba di Kampung Budaya!</p>
-      <p>Kami sangat antusias untuk melihat Anda bersinar dalam acara ini.</p>
+      <p>
+        Terimakasih telah mendaftar untuk Lomba di Kampung Budaya! Kami sangat
+        antusias untuk melihat Anda bersinar dalam acara ini.
+      </p>
+
       <div class="details">
         <h2>Detail Registrasi:</h2>
         <ul>
-          <li><strong>Nama Peserta:</strong> [Nama Peserta]</li>
-          <li><strong>Jenis Lomba:</strong> [Jenis Lomba]</li>
+          <li><strong>Nama Peserta :</strong> {{.Name}}</li>
+          <li><strong>Jenis Lomba :</strong> {{.Contest}}</li>
         </ul>
       </div>
-      <a class="button" href="https://example.com/lomba-di-kampung-budaya"
+      <a class="button" href="https://kampungbudayaub.org/"
         >Lihat Detail Acara</a
       >
       <p>
@@ -100,6 +109,7 @@
         berharap Anda akan memiliki pengalaman yang luar biasa!
       </p>
       <p>Terima kasih dan salam budaya!</p>
+      <a href="itkampungbudaya@gmail.com">itkampungbudaya@gmail.com</a>
     </div>
   </body>
 </html>

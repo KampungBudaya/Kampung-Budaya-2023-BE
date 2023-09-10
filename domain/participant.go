@@ -56,14 +56,14 @@ type CleanParticipant struct {
 
 func (p *StoreParticipant) Validate() error {
 	switch {
-	case p.ContestID < 1 || p.ContestID > 5:
+	case p.ContestID < 1 || p.ContestID > 4:
 		return errors.New("ID LOMBA TIDAK VALID")
 	case p.Name == "":
 		return errors.New("FIELD NAMA TIDAK BOLEH KOSONG")
 	case p.Birth == "":
 		return errors.New("FIELD TANGGAL LAHIR TIDAK BOLEH KOSONG")
 	case p.Institution == "":
-		return errors.New("FIELD ASAL TIDAK BOLEH KOSONG")
+		return errors.New("FIELD INSTITUSI TIDAK BOLEH KOSONG")
 	case p.Email == "" || validateEmail(p.Email):
 		return errors.New("FIELD EMAIL TIDAK VALID")
 	case p.Instagram == "":
@@ -75,9 +75,15 @@ func (p *StoreParticipant) Validate() error {
 	case p.Category == "":
 		return errors.New("FIELD CATEGORY TIDAK BOLEH KOSONG")
 	case p.ContestID == 1 || p.ContestID == 2 || p.ContestID == 3:
-		if p.VideoURL == "" {
+		if (p.VideoURL == "") || (p.Category == "UMUM" && p.VideoURL == "") {
 			return errors.New("FIELD LINK VIDEO TIDAK BOLEH KOSONG")
 		}
+	case p.ContestID == 4:
+		if p.Category == "UMUM" {
+			return errors.New("MAAF LOMBA INI HANYA BISA DIIKUTI OLEH FORDA")
+		}
+	default:
+		return nil
 	}
 	return nil
 }
@@ -105,7 +111,7 @@ func (p *ParticipantDB) Clean() *CleanParticipant {
 }
 
 func validatePhoneNumber(phoneNumber string) bool {
-	if len(phoneNumber) > 13 || len(phoneNumber) < 12 || phoneNumber[:1] != "0" {
+	if len(phoneNumber) > 14 || len(phoneNumber) < 12 || phoneNumber[:1] != "0" {
 		return true
 	}
 

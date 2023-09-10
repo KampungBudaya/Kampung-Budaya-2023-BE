@@ -18,7 +18,7 @@ type Gomail struct {
 func NewMailClient() *Gomail {
 	port, err := strconv.Atoi(os.Getenv("CONFIG_SMTP_PORT"))
 	if err != nil {
-		log.Fatalf("[tedxub2023-api-http] failed to convert smtp port: %s\n", err.Error())
+		log.Fatalf("failed to convert smtp port: %s\n", err.Error())
 	}
 
 	return &Gomail{
