@@ -11,4 +11,4 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 INSERT INTO users (provider, name, email) VALUES
-("google", "Super IT KB23", "ITKampungBudaya@gmail.com")
+("google", "Super IT KB23", "itkampungbudaya@gmail.com")
