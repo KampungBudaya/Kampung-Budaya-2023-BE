@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	httpSwagger "github.com/swaggo/http-swagger"
@@ -64,10 +65,17 @@ func Run() error {
 	googleUsecase := googleUsecase.NewGoogleUsecase(oauthRepository, os.Getenv("GOOGLE_CLIENT_ID"))
 	googleHttpDelivery.NewGoogleHandler(v1, googleUsecase)
 
-	app.Use(mux.CORSMethodMiddleware(app))
+	allowedHeaders := handlers.AllowedHeaders([]string{"Authorization", "Content-Type", "Origin", "X-Requested-With"})
+	allowedOrigins := handlers.AllowedOrigins([]string{os.Getenv("ALLOWED_ORIGIN")})
+	allowedMethods := handlers.AllowedMethods([]string{
+		http.MethodGet,
+		http.MethodHead,
+		http.MethodPost,
+		http.MethodPatch,
+	})
 
 	fmt.Println("Server running on port " + port)
-	if err := http.ListenAndServe(":"+port, app); err != nil {
+	if err := http.ListenAndServe(":"+port, handlers.CORS(allowedHeaders, allowedOrigins, allowedMethods)(app)); err != nil {
 		return err
 	}
 
