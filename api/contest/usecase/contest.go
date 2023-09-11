@@ -145,7 +145,10 @@ func (uc *ContestUsecase) RejectParticipant(ctx context.Context, id int) error {
 }
 
 func uploadPhotos(ctx context.Context, file []byte, fileName string) (string, error) {
-	fb := config.InitFirebase()
+	fb, err := config.InitFirebase()
+	if err != nil {
+		return "", err
+	}
 	link, err := fb.UploadFile(ctx, file, fileName)
 	if err != nil {
 		return "", err

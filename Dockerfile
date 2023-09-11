@@ -15,7 +15,7 @@ RUN apk --no-cache add ca-certificates
 
 WORKDIR /root
 
-COPY .env .
+COPY .env firebase_credential.json ./
 COPY --from=builder /app/main .
 
 ENTRYPOINT ["./main"]
