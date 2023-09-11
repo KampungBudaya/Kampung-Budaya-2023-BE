@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/api/oauth/google/usecase"
+	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/domain"
 	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/middleware"
 	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/util/response"
 	"github.com/gorilla/mux"
@@ -24,7 +25,7 @@ func NewGoogleHandler(router *mux.Router, google usecase.GoogleUsecaseImpl) {
 	}
 
 	googleOAuth := handler.router.PathPrefix("/oauth/google").Subrouter()
-	// googleOAuth.Use(middleware.Guest)
+	googleOAuth.Use(middleware.Guest)
 	googleOAuth.HandleFunc("", handler.SignIn).Methods(http.MethodPost)
 }
 
@@ -46,15 +47,14 @@ func (h *GoogleHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 		response.Success(w, code, data)
 	}()
 
-	var request struct{ token string }
+	var request domain.AuthRequest
 
-	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&request); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		code = http.StatusBadRequest
 		return
 	}
 
-	claims, err := h.google.ValidateGoogleJWT(request.token)
+	claims, err := h.google.ValidateGoogleJWT(request.Token)
 	if err != nil {
 		code = http.StatusBadRequest
 		return
@@ -64,13 +64,6 @@ func (h *GoogleHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		code = http.StatusUnauthorized
 		return
-	}
-
-	if user.ProviderID == "" {
-		if h.google.UpdateProviderID(user.ID, claims.ID, ctx); err != nil {
-			code = http.StatusInternalServerError
-			return
-		}
 	}
 
 	token, err := middleware.GenerateJWT(user.ID, user.Roles)
@@ -84,6 +77,8 @@ func (h *GoogleHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 		err = ctx.Err()
 		code = http.StatusRequestTimeout
 	default:
-		data = struct{ token string }{token: token}
+		response := domain.AuthResponse{SignedToken: token}
+		response.Populate(user.Roles)
+		data = response
 	}
 }
