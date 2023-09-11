@@ -14,21 +14,22 @@ type Firebase struct {
 	Storage *firebase_storage.Client
 }
 
-func InitFirebase() *Firebase {
+func InitFirebase() (*Firebase, error) {
 	opt := option.WithCredentialsFile(os.Getenv("FIREBASE_CREDENTIAL_PATH"))
 	app, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	firebaseStorage, err := app.Storage(context.Background())
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return &Firebase{
+	firebase := &Firebase{
 		Storage: firebaseStorage,
 	}
+	return firebase, nil
 }
 
 func (f *Firebase) UploadFile(ctx context.Context, file []byte, fileName string) (string, error) {
