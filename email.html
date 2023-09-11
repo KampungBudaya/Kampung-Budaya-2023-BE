@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        text-align: center;
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        justify-content: center;
+        text-align: center;
+        align-content: center;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 20px;
+      }
+
+      .header {
+        background-color: rgb(15, 71, 175);
+        color: #fff;
+        padding: 10px;
+        border-radius: 10px 10px 0 0;
+      }
+
+      .logo {
+        width: 100px;
+        height: 100px;
+      }
+
+      h1 {
+        font-size: 28px;
+        margin-top: 0;
+        color: black;
+      }
+
+      p {
+        font-size: 18px;
+        line-height: 1.6;
+        color: black;
+      }
+
+      .details {
+        text-align: center;
+        margin-top: 20px;
+        color: black;
+      }
+
+      .details ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      .details li {
+        margin-bottom: 10px;
+      }
+
+      .button {
+        display: inline-block;
+        background-color: #FFE880;
+        color: black;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 5px;
+        margin-top: 20px;
+      }
+
+      .button:hover {
+        background-color: #FFD700;
+      }
+    </style>
+    <title>Konfirmasi Registrasi Lomba di Kampung Budaya 2023</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <img
+          class="logo"
+          src="https://drive.google.com/uc?id=14w28DEToJCqe8paN9c_AoXBkFpMLe0Si"
+          alt="Logo Kampung Budaya"
+        />
+        <h3>Kampung Budaya 2023</h3>
+      </div>
+      <p>
+        Terimakasih telah mendaftar untuk Lomba di Kampung Budaya! Kami sangat
+        antusias untuk melihat Anda bersinar dalam acara ini.
+      </p>
+
+      <div class="details">
+        <h2>Detail Registrasi:</h2>
+        <ul>
+          <li><strong>Nama Peserta :</strong> {{.Name}}</li>
+          <li><strong>Jenis Lomba :</strong> {{.Contest}}</li>
+        </ul>
+      </div>
+      <a class="button" href="https://kampungbudayaub.org/lomba"
+        >Lihat Detail Acara</a
+      >
+      <p>
+        Jangan ragu untuk menghubungi kami jika Anda memiliki pertanyaan. Kami
+        berharap Anda akan memiliki pengalaman yang luar biasa!
+      </p>
+      <p>Terima kasih dan salam budaya!</p>
+      <a href="itkampungbudaya@gmail.com">itkampungbudaya@gmail.com</a>
+    </div>
+  </body>
+</html>

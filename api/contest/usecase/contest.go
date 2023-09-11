@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"io"
 	"mime/multipart"
+	"os"
 
 	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/api/contest/repository"
 	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/config"
 	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/domain"
+	"github.com/KampungBudaya/Kampung-Budaya-2023-BE/util/email"
 )
 
 type ContestUsecaseImpl interface {
@@ -100,6 +102,15 @@ func (uc *ContestUsecase) AcceptParticipant(ctx context.Context, id int) error {
 
 	err = tx.Commit()
 	if err != nil {
+		return err
+	}
+
+	mail := email.NewMailClient()
+	mail.SetSender(os.Getenv("CONFIG_SENDER_NAME"))
+	mail.SetReciever(participant.Email)
+	mail.SetSubject("Announcement Email")
+	mail.SetBodyHTML(participant.Name, participant.Contest)
+	if err := mail.SendMail(); err != nil {
 		return err
 	}
 	return nil

@@ -20,21 +20,21 @@ type ContestHandler struct {
 	router  *mux.Router
 }
 
-func NewContestHandler(router *mux.Router, Contest usecase.ContestUsecaseImpl) {
-	compHandler := ContestHandler{
-		contest: Contest,
+func NewContestHandler(router *mux.Router, contest usecase.ContestUsecaseImpl) {
+	contestHandler := ContestHandler{
+		contest: contest,
 		router:  router,
 	}
 
-	compHandler.router.HandleFunc("/contest", compHandler.RegisterContest).Methods(http.MethodPost)
+	contestHandler.router.HandleFunc("/contest", contestHandler.RegisterContest).Methods(http.MethodPost)
 
-	handlers := compHandler.router.PathPrefix("/participants").Subrouter()
+	handlers := contestHandler.router.PathPrefix("/participants").Subrouter()
 	handlers.Use(middleware.ValidateJWT)
 
-	handlers.HandleFunc("", compHandler.GetAllParticipants).Methods(http.MethodGet)
-	handlers.HandleFunc("/{id}", compHandler.GetParticipantByID).Methods(http.MethodGet)
-	handlers.HandleFunc("/{id}/accept", compHandler.AcceptParticipant).Methods(http.MethodPatch)
-	handlers.HandleFunc("/{id}/reject", compHandler.RejectParticipant).Methods(http.MethodPatch)
+	handlers.HandleFunc("", contestHandler.GetAllParticipants).Methods(http.MethodGet)
+	handlers.HandleFunc("/{id}", contestHandler.GetParticipantByID).Methods(http.MethodGet)
+	handlers.HandleFunc("/{id}/accept", contestHandler.AcceptParticipant).Methods(http.MethodPatch)
+	handlers.HandleFunc("/{id}/reject", contestHandler.RejectParticipant).Methods(http.MethodPatch)
 }
 
 func (h *ContestHandler) RegisterContest(w http.ResponseWriter, r *http.Request) {
