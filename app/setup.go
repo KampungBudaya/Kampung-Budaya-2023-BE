@@ -64,6 +64,8 @@ func Run() error {
 	googleUsecase := googleUsecase.NewGoogleUsecase(oauthRepository, os.Getenv("GOOGLE_CLIENT_ID"))
 	googleHttpDelivery.NewGoogleHandler(v1, googleUsecase)
 
+	app.Use(mux.CORSMethodMiddleware(app))
+
 	fmt.Println("Server running on port " + port)
 	if err := http.ListenAndServe(":"+port, app); err != nil {
 		return err

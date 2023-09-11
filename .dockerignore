@@ -1,0 +1,6 @@
+Makefile
+README.md
+
+.env.example
+.gitignore
+.editorconfig
