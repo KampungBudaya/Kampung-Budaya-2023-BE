@@ -43,9 +43,9 @@ func ValidateJWT(next http.Handler) http.Handler {
 
 		bearer = strings.ReplaceAll(bearer, "Bearer ", "")
 
-		var claims *domain.AuthClaims
-		token, err := jwt.ParseWithClaims(bearer, claims, func(t *jwt.Token) (interface{}, error) {
-			return []byte(os.Getenv("SECRET,KEY")), nil
+		var claims domain.AuthClaims
+		token, err := jwt.ParseWithClaims(bearer, &claims, func(t *jwt.Token) (interface{}, error) {
+			return []byte(os.Getenv("SECRET_KEY")), nil
 		})
 		if err != nil {
 			response.Fail(w, http.StatusUnauthorized, "Token Has Been Tampered")

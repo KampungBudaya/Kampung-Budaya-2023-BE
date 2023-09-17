@@ -3,6 +3,7 @@ package domain
 import (
 	"errors"
 	"regexp"
+	"strconv"
 )
 
 type ParticipantDB struct {
@@ -70,7 +71,7 @@ func (p *StoreParticipant) Validate() error {
 		return errors.New("FIELD INSTAGRAM TIDAK BOLEH KOSONG")
 	case p.Line == "":
 		return errors.New("FIELD LINE TIDAK BOLEH KOSONG")
-	case p.PhoneNumber == "" || validatePhoneNumber(p.PhoneNumber):
+	case p.PhoneNumber == "" || !validatePhoneNumber(p.PhoneNumber):
 		return errors.New("FIELD NOMOR TELEPON TIDAK VALID")
 	case p.Category == "":
 		return errors.New("FIELD CATEGORY TIDAK BOLEH KOSONG")
@@ -111,16 +112,16 @@ func (p *ParticipantDB) Clean() *CleanParticipant {
 }
 
 func validatePhoneNumber(phoneNumber string) bool {
-	if len(phoneNumber) > 14 || len(phoneNumber) < 12 || phoneNumber[:1] != "0" {
-		return true
+	length := len(phoneNumber)
+	if length < 10 || length > 13 || phoneNumber[:2] != "08" {
+		return false
 	}
 
-	for _, char := range phoneNumber {
-		if char < '0' || char > '9' || char == '+' {
-			return true
-		}
+	if _, err := strconv.Atoi(phoneNumber); err != nil {
+		return false
 	}
-	return false
+
+	return true
 }
 
 func validateEmail(email string) bool {

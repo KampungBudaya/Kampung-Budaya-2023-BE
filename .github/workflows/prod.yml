@@ -1,0 +1,34 @@
+name: Build and Deploy to Production
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  deploy:
+    if: "contains(github.event.head_commit.message, 'RAWR')"
+    name: 🎉 Build and Deploy App
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📦 Get latest code
+      uses: actions/checkout@v3
+
+    - name: 🚚 Send files via SCP
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
+        port: ${{ secrets.PORT }}
+        source: "./*"
+        target: /root/apps/kampung_budaya_2023
+
+    - name: 🐋 Rebuild docker image and rerun
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
+        port: ${{ secrets.PORT }}
+        script: cd /root/apps/kampung_budaya_2023 && docker compose up -d --no-deps --build backend

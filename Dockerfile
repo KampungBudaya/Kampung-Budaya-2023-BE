@@ -1,21 +1,25 @@
 FROM golang:alpine as builder
 
-WORKDIR /app
+RUN apk update && apk add --no-cache ca-certificates git
 
-COPY go.mod .
-COPY go.sum .
+WORKDIR /src
+
+COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
 
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates
 
 WORKDIR /root
 
-COPY .env .
-COPY --from=builder /app/main .
+COPY --from=builder /src/main .
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY .env firebase_credential.json email.html ./
+
+VOLUME ["/cert-cache"]
 
 ENTRYPOINT ["./main"]
