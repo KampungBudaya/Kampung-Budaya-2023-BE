@@ -62,26 +62,6 @@ func (uc *ContestUsecase) RegisterContest(ctx context.Context, req domain.StoreP
 		return 0, err
 	}
 
-	if err := uc.sheets.AppendRow(
-		"O",
-		id,
-		req.Name,
-		req.Birth,
-		req.Category,
-		"PENDING",
-		req.ContestID,
-		req.Institution,
-		req.Email,
-		req.Instagram,
-		req.Line,
-		req.PhoneNumber,
-		req.FormURL,
-		req.VideoURL,
-		req.PaymentProof,
-	); err != nil {
-		return 0, err
-	}
-
 	return id, nil
 }
 
@@ -124,6 +104,26 @@ func (uc *ContestUsecase) AcceptParticipant(ctx context.Context, id int) error {
 
 	err = tx.Commit()
 	if err != nil {
+		return err
+	}
+
+	if err := uc.sheets.AppendRow(
+		"O",
+		participant.ID,
+		participant.Name,
+		participant.Institution,
+		participant.Category,
+		participant.Birth,
+		participant.Email,
+		participant.PhoneNumber,
+		participant.Instagram,
+		participant.Line,
+		participant.Form,
+		participant.VideoURL,
+		participant.PaymentProof,
+		participant.Contest,
+		"ACCEPTED",
+	); err != nil {
 		return err
 	}
 

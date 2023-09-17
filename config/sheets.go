@@ -26,12 +26,10 @@ func (srv *SheetsService) AppendRow(cellEnds string, values ...interface{}) erro
 		Values: [][]interface{}{values},
 	}
 
-	resp, err := srv.srv.Spreadsheets.Values.Append(srv.id, "Sheet1!A:"+cellEnds, inputValues).ValueInputOption("RAW").Do()
+	_, err := srv.srv.Spreadsheets.Values.Append(srv.id, "Participants!A:"+cellEnds, inputValues).ValueInputOption("RAW").Do()
 	if err != nil {
 		return err
 	}
-
-	println(resp.TableRange)
 
 	return nil
 }
