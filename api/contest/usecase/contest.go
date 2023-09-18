@@ -24,11 +24,13 @@ type ContestUsecaseImpl interface {
 
 type ContestUsecase struct {
 	contest repository.ContestRepositoryImpl
+	sheets  *config.SheetsService
 }
 
-func NewContestUsecase(contest repository.ContestRepositoryImpl) ContestUsecaseImpl {
+func NewContestUsecase(contest repository.ContestRepositoryImpl, sheets *config.SheetsService) ContestUsecaseImpl {
 	return &ContestUsecase{
 		contest: contest,
+		sheets:  sheets,
 	}
 }
 
@@ -102,6 +104,26 @@ func (uc *ContestUsecase) AcceptParticipant(ctx context.Context, id int) error {
 
 	err = tx.Commit()
 	if err != nil {
+		return err
+	}
+
+	if err := uc.sheets.AppendRow(
+		"O",
+		participant.ID,
+		participant.Name,
+		participant.Institution,
+		participant.Category,
+		participant.Birth,
+		participant.Email,
+		participant.PhoneNumber,
+		participant.Instagram,
+		participant.Line,
+		participant.Form,
+		participant.VideoURL,
+		participant.PaymentProof,
+		participant.Contest,
+		"ACCEPTED",
+	); err != nil {
 		return err
 	}
 

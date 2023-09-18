@@ -1,6 +1,7 @@
 package app
 
 import (
+	"crypto/tls"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,6 +11,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	httpSwagger "github.com/swaggo/http-swagger"
+	"golang.org/x/crypto/acme/autocert"
 
 	contestHttpDelivery "github.com/KampungBudaya/Kampung-Budaya-2023-BE/api/contest/delivery/http"
 	contestRepository "github.com/KampungBudaya/Kampung-Budaya-2023-BE/api/contest/repository"
@@ -79,8 +81,21 @@ func Run() error {
 		http.MethodPatch,
 	})
 
+	certManager := autocert.Manager{
+		Prompt:     autocert.AcceptTOS,
+		Cache:      autocert.DirCache("cert-cache"),
+		HostPolicy: autocert.HostWhitelist("backend.kampungbudayaub.cloud"),
+	}
+
+	server := http.Server{
+		Addr:      ":443",
+		Handler:   handlers.CORS(allowedHeaders, allowedOrigins, allowedMethods)(app),
+		TLSConfig: &tls.Config{GetCertificate: certManager.GetCertificate},
+	}
+
 	fmt.Println("Server running on port " + port)
-	if err := http.ListenAndServe(":"+port, handlers.CORS(allowedHeaders, allowedOrigins, allowedMethods)(app)); err != nil {
+	go http.ListenAndServe(":"+port, certManager.HTTPHandler(nil))
+	if err := server.ListenAndServeTLS("", ""); err != nil {
 		return err
 	}
 

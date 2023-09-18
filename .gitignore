@@ -29,3 +29,4 @@ server.key
 .env.prod
 .env.dev
 firebase_credential.json
+sheets_credential.json

@@ -4,3 +4,5 @@ README.md
 .env.example
 .gitignore
 .editorconfig
+
+app/setup.go
