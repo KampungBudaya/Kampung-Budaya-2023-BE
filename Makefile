@@ -32,7 +32,7 @@ migrate-version:
 	migrate -database ${DB_DSN} -path ${MIGRATION_DIR} version
 
 up:
-	go run main.go
+	@go run main.go
 
 cert:
 	openssl genrsa -out server.key 2048 && openssl ecparam -genkey -name secp384r1 -out server.key && openssl req -new -x509 -sha256 -key server.key -out server.crt -days 3650
