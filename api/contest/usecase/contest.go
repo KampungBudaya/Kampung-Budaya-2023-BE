@@ -109,7 +109,19 @@ func (uc *ContestUsecase) AcceptParticipant(ctx context.Context, id int) error {
 	mail.SetSender(os.Getenv("CONFIG_SENDER_NAME"))
 	mail.SetReciever(participant.Email)
 	mail.SetSubject("Announcement Email")
-	mail.SetBodyHTML(participant.Name, participant.Contest)
+
+	var groupLink string
+	if participant.Contest == "Tari" {
+		groupLink = os.Getenv("GROUP_LINK_TARI")
+	} else if participant.Contest == "Musik" {
+		groupLink = os.Getenv("GROUP_LINK_MUSIK")
+	} else if participant.Contest == "Busana Kreasi" {
+		groupLink = os.Getenv("GROUP_LINK_BUSANA_KREASI")
+	} else {
+		groupLink = os.Getenv("GROUP_LINK_STAND_BAZAR")
+	}
+
+	mail.SetBodyHTML(participant.Name, participant.Contest, groupLink)
 	if err := mail.SendMail(); err != nil {
 		return err
 	}
