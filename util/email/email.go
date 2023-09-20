@@ -43,7 +43,7 @@ func (g *Gomail) SetSubject(subject string) {
 	g.message.SetHeader("Subject", subject)
 }
 
-func (g *Gomail) SetBodyHTML(name, contest string) error {
+func (g *Gomail) SetBodyHTML(name, contest, groupLink string) error {
 	var body bytes.Buffer
 	path := "email.html"
 	t, err := template.ParseFiles(path)
@@ -52,11 +52,13 @@ func (g *Gomail) SetBodyHTML(name, contest string) error {
 	}
 
 	t.Execute(&body, struct {
-		Name    string
-		Contest string
+		Name      string
+		Contest   string
+		GroupLink string
 	}{
-		Name:    name,
-		Contest: contest,
+		Name:      name,
+		Contest:   contest,
+		GroupLink: groupLink,
 	})
 	g.message.SetBody("text/html", body.String())
 	return nil
