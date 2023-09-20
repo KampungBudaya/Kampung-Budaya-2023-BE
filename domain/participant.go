@@ -76,7 +76,7 @@ func (p *StoreParticipant) Validate() error {
 	case p.Category == "":
 		return errors.New("FIELD CATEGORY TIDAK BOLEH KOSONG")
 	case p.ContestID == 1 || p.ContestID == 2 || p.ContestID == 3:
-		if (p.VideoURL == "") || (p.Category == "UMUM" && p.VideoURL == "") {
+		if p.Category == "UMUM" && p.VideoURL == "" {
 			return errors.New("FIELD LINK VIDEO TIDAK BOLEH KOSONG")
 		}
 	case p.ContestID == 4:
