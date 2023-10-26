@@ -39,7 +39,7 @@ func NewContestHandler(router *mux.Router, contest usecase.ContestUsecaseImpl) {
 
 func (h *ContestHandler) RegisterContest(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 25*time.Second)
-	defer cancel()
+	cancel()
 
 	var (
 		err  error
