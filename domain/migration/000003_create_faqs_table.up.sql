@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS contests (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  category ENUM('1', '2', '3', '4', '5') NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  question TEXT NOT NULL,
+  answer TEXT NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT (NOW()),
+  updated_at DATETIME NOT NULL DEFAULT (NOW())
+);
